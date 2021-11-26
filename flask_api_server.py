@@ -31,7 +31,10 @@ api = Api(app) # Flask-RESTful extension wrapper                                
 
 # Global variables
 LED_GPIO_PIN = 21
+LED2_GPIO_PIN = 20
+
 led = None # PWMLED Instance. See init_led()
+led2 = None # PWMLED Instance. See init_led()
 state = {                                                                            # (6)
     'level': 50 # % brightless of LED.
 }
@@ -42,8 +45,12 @@ GPIO Related Functions
 def init_led():
     """Create and initialise an PWMLED Object"""
     global led
+    global led2
+    
     led = PWMLED(LED_GPIO_PIN)
+    led2 = PWMLED(LED2_GPIO_PIN)
     led.value = state['level'] / 100                                                 # (7)
+    led2.value = state['level'] / 100                                                 # (7)
 
 
 """
@@ -56,7 +63,7 @@ Flask & Flask-Restful Related Functions
 def index():
     """Make sure inde.html is in the templates folder
     relative to this Python file."""
-    return render_template('index_api_client.html', pin=LED_GPIO_PIN)                # (9)
+    return render_template('index_api_client.html', pin=LED_GPIO_PIN, pin2=LED2_GPIO_PIN)  # (9)
 
 
 # Flask-restful resource definitions.
@@ -88,6 +95,7 @@ class LEDControl(Resource):  # (10)
         # Set PWM duty cycle to adjust brightness level.
         state['level'] = args.level                                                  # (16)
         led.value = state['level'] / 100                                             # (17)
+        led2.value = state['level'] / 100                                             # (17)
         logger.info("LED brightness level is " + str(state['level']))
 
         return state                                                                 # (18)
